@@ -2,6 +2,7 @@
 import java.io.*;
 import java.util.*;
 import java.text.* ;
+import java.nio.file.*;
 
 public class ServeurHTTP extends Server {
 	public ServeurHTTP(int port, boolean verbose) throws IOException {
@@ -31,35 +32,42 @@ public class ServeurHTTP extends Server {
 		}
 	}
 // methode de dialogue correspondant à l'écho par le serveur d'une (seule) chaine lue cad reçue (envoyée) du client
-	private void dialogue () throws IOException {
+	private void dialogue () throws IOException {		
 		acceptConn();
-		Requete req=getRequete() ;
-		if (req!= new Requete("",0))
-			repRequete(req) ;
-		closeConn();
+		try {
+			Requete req=getRequete() ;
+			if (req!= new Requete(""))
+				repRequete(req) ;
+			closeConn();
+		}
+		catch (NullPointerException e) {
+			closeConn() ;
+		}
 	}
 
 	//Début de la méthode getRequete
 	private Requete getRequete() throws IOException {
-		String creply = null;;
-		Requete res = new Requete ("",0) ;
+
+		String creply = null;
+		Requete res = new Requete ("") ;
 		creply = readline();
+		System.out.println(creply);
 		String[] listeMots=creply.split(" ") ;
+		String chemin = "" ;
 
 		if ((creply==null)||(creply.equals(""))){
-			res=new Requete("", 0) ;
+			res=new Requete("") ;
 		}
 		else if (listeMots[0].equals("GET")) {
 			while (!(creply.equals(""))) { 
 				creply = readline();
 				if(creply==null){
-					res=new Requete ("", 0);
+					res=new Requete ("");
 				}
-				if (listeMots[1].equals("/date")){
-					res=new Requete ("/date", 1) ;
+				else {
+					chemin = listeMots[1] ; 
+					res=new Requete (chemin) ;
 				}
-				else 
-					res=new Requete ("", 0) ;
 			
 			}
 		}
@@ -68,14 +76,14 @@ public class ServeurHTTP extends Server {
 				creply = readline();
 				if(creply==null){
 					
-					res=new Requete ("", 0);
+					res=new Requete ("");
 				}
 			}
 			creply=readline() ;
-			res=new Requete("",0);			
+			res=new Requete("");			
 		}
 		else 
-			res=new Requete("",0) ;
+			res=new Requete("") ;
 
 		return res ;
 	}
@@ -85,21 +93,57 @@ public class ServeurHTTP extends Server {
 	private void repRequete(Requete requete) throws IOException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat ("EE dd MMM yyyy HH:mm:ss") ;
 		Date date = new Date() ;
+		String nom=requete.getNom() ;
 
-		
-		if(requete.getType()==1){
+		if (requete.getType()>0){
+			String mimetype=requete.getMimetype() ;
 
 			writeline("HTTP/1.0 200 OK") ;
-			writeline("Content-type : text-plain"+"\n") ;
+			writeline("Content-type :"+mimetype+"\n") ;
 
-			writeline("Date courante : ") ;
-			writeline(dateFormat.format(date)+"\n") ;
+			if (mimetype.equals("text/html")) {
+				writeline("<!doctype html>");
+				writeline("<html lang='fr'>") ;
+				writeline("<head>") ;
+				writeline("		<meta charset=utf-8>") ;
+				writeline("		<title>"+nom+" </title>") ;
+				writeline("		<link rel='stylesheet' href='style.css'>") ;
+				writeline("</head>") ;
+				writeline("<body>") ;
+			}
+
+			if(requete.getType()==1){
+				writeline("Date courante : ") ;
+				writeline(dateFormat.format(date)+"\n") ;
+			}
+
+			else if (requete.getType()==2){
+				writeline("<h1> Le Répertoire "+String.valueOf(requete)+" contient : </h1>") ;
+				File repertoire = new File(requete.getChemin());
+				File[] sousRep = repertoire.listFiles();
+				writeline("<ul>") ;
+				for(File s:sousRep){
+					writeline("<li> <a href=\"http://localhost:1234"+ s.getPath()+"\">"+s.getName()+"</a> </li>");
+				}
+				writeline("</ul>") ;				
+			}
+
+			else if (requete.getType()==3){
+				ecrireFichier(requete.getChemin()) ;
+			}
+
+			if (mimetype.equals("text/html")){
+				writeline("</body>") ;
+				writeline("</html>") ; 
+			}
 		}
 			
 		else {
 			writeline("HTTP/1.0 404 Not Found") ;
 			writeline ("Content-type: text/html \n") ;
+
 			
+
 			writeline("<!doctype html>");
 			writeline("<html lang='fr'>") ;
 			writeline("<head>") ;
@@ -115,4 +159,18 @@ public class ServeurHTTP extends Server {
 
 
 	}
+
+	private static void ecrireFichier(String chemin) throws IOException {
+		Path path = Paths.get(chemin);
+		byte[] br = Files.readAllBytes(path) ;
+	}
+
+	/*private static String reformChemin(String chemin) {
+		String[] partiesChemin = chemin.split(" ");
+		String res=partiesChemin[0] ;
+		for (int i=1 ; i<partiesChemin.length-1 ; i++) {
+			res=res+"\\ "+partiesChemin[i] ;
+		}
+		return res ;
+	} */
 }
