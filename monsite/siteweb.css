@@ -1,1 +1,12 @@
-
+body{
+  background-color:#1C3A78;
+}
+h1 {
+  padding: 2px 5px 2px 5px;
+  border-radius: 10px;
+  background-color:#D1D4E4;
+}
+.boutonIndex{
+  border-radius: 10px;
+  background-color:#550B00;
+}
