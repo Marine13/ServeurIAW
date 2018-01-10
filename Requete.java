@@ -40,8 +40,17 @@ public class Requete {
 				}
 
 				else if (fichier.isDirectory()) {
+					File repertoire = new File(chemin);
+					File[] sousRep = repertoire.listFiles();
 					type=2 ;
 					mimetype="text/html" ;
+					for (File s : sousRep){
+						if (s.getName().equals("Index.html")){
+							type=4 ;
+						}
+
+					}
+					
 				}
 			}
 			else 

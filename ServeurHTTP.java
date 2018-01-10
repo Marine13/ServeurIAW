@@ -101,7 +101,7 @@ public class ServeurHTTP extends Server {
 			writeline("HTTP/1.0 200 OK") ;
 			writeline("Content-type :"+mimetype+"\n") ;
 
-			if (mimetype.equals("text/html")) {
+			if (requete.getType()==2) {
 				writeline("<!doctype html>");
 				writeline("<html lang='fr'>") ;
 				writeline("<head>") ;
@@ -132,7 +132,17 @@ public class ServeurHTTP extends Server {
 				ecrireFichier(requete.getChemin()) ;
 			}
 
-			if (mimetype.equals("text/html")){
+			else if (requete.getType()==4){
+				writeline("<!DOCTYPE html>");
+				writeline("<html lang=\"fr_FR\">") ;
+  				writeline("<head>") ;
+    			writeline("<meta charset=\"utf-8\">") ;
+    			writeline("<meta http-equiv=\"refresh\" content=\"0; URL=http://localhost:1234"+requete.getChemin()+"/Index.html\">") ;
+				writeline("</head>") ;
+				writeline("</html>");
+			}
+
+			if (requete.getType()==2){
 				writeline("</body>") ;
 				writeline("</html>") ; 
 			}
@@ -160,16 +170,26 @@ public class ServeurHTTP extends Server {
 
 	}
 
-	private static void ecrireFichier(String chemin) throws IOException {
-		Path path = Paths.get(chemin);
-		byte[] br = Files.readAllBytes(path) ;
+	private void ecrireFichier(String chemin) throws IOException {
+		int br ;
+		byte[] b = new byte[1];
+		File f ;
+		f=new File(chemin) ;
+		FileInputStream fis ;
+		fis = new FileInputStream(f) ;
+		br=fis.read(b) ;
+		while (br>=0) {
+			write(b) ;
+			br=fis.read(b) ;
+		}
+		
 	}
 
 	/*private static String reformChemin(String chemin) {
 		String[] partiesChemin = chemin.split(" ");
 		String res=partiesChemin[0] ;
-		for (int i=1 ; i<partiesChemin.length-1 ; i++) {
-			res=res+"\\ "+partiesChemin[i] ;
+		for (int i=1 ; i<partiesChemin.length ; i++) {
+			res=res+"%20"+partiesChemin[i] ;
 		}
 		return res ;
 	} */
