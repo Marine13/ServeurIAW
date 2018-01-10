@@ -1,6 +1,6 @@
 body{
   background-color:#1C3A78;
-  font-family: Avantgarde;
+  font-family:fantasy;
 }
 h1 {
   padding: 10px 20px 10px 20px;
@@ -12,35 +12,23 @@ h1 {
   margin-left: auto;
   margin-right: auto;
 }
-.boutonIndex{
+.bande{
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+.boutonIndex, .boutonPage1, .boutonPage2{
+  width:60%;
   padding:10px;
-  margin-left: 50px;
-  width:70px;
   text-align: center;
   border: 2px solid #550B00;
   border-radius: 5px;
   background-color:#DACBCA;
   float:left;
 }
-.boutonPage1 a{
-	padding:10px;
-  margin-left: 50px;
-  width: 70px;
-  text-align: center;
-  border: 2px solid #550B00;
-  border-radius: 5px;
-  background-color:#DACBCA;
-  float:left;
-}
-.boutonPage2 a{
-  padding:10px;
-  margin-left: 340px;
-  width: 70px;
-  text-align: center;
-  border: 2px solid #550B00;
-  border-radius: 5px;
-  background-color:#DACBCA;
-	display: block;
+.boutonPage1, .boutonPage2{
+  margin-left: 20%;
 }
 .boutonIndex a:visited {
 	background-color:#550B00;
@@ -48,22 +36,23 @@ h1 {
 a {
 	text-decoration: none;
 }
-.col1{
-	float: left;
-	margin-left: 7%;
-	max-width: 35%;
-	min-width: 200px;
-	background-color: white;
-	border: 4px solid black;
-	border-radius: 2px;
-	padding: 2%;
+.wrapper{
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2%;
+  width: 90%;
+}
+.col1, .col2{
+  width: 100%;
+  min-width: 250px;
+  background-color: white;
+  border: 4px solid black;
+  border-radius: 2px;
+  padding: 2%;
+  text-align: justify;
+  float: left;
 }
 .col2{
-	margin-left: 50%;
-	max-width: 35%;
-	min-width: 200px;
-	background-color: white;
-	border: 4px solid black;
-	border-radius: 2px;
-	padding: 2%;
+	margin-left: 4%;
 }
