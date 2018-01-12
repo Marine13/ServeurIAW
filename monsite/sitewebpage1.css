@@ -35,7 +35,11 @@ a {
   color: #550B00;
 }
 .boutonPage1{
-
+  background-color:#550B00;
+}
+.boutonPage1 a{
+  color:#DACBCA;
+}
 .wrapper{
   display: flex;
   margin-left: auto;
