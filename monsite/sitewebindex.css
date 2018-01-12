@@ -30,11 +30,15 @@ h1 {
 .boutonPage1, .boutonPage2{
   margin-left: 20%;
 }
-.boutonIndex a:visited {
-	background-color:#550B00;
-}
 a {
 	text-decoration: none;
+  color: #550B00;
+}
+.boutonIndex{
+  background-color:#550B00;
+}
+.boutonIndex a{
+  color:#DACBCA;
 }
 .wrapper{
   display: flex;
