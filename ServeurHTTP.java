@@ -52,7 +52,8 @@ public class ServeurHTTP extends Server {
 		Requete res = new Requete ("") ;
 		creply = readline();
 		String[] listeMots=creply.split(" ") ;
-		String chemin = "" ;
+		String chemin;
+		String parametre ;
 
 		if ((creply==null)||(creply.equals(""))){
 			res=new Requete("") ;
@@ -64,8 +65,8 @@ public class ServeurHTTP extends Server {
 					res=new Requete ("");
 				}
 				else {
-					chemin = listeMots[1] ; 
-					res=new Requete (chemin) ;
+					chemin = "."+listeMots[1] ;
+					res=new Requete (reformChemin(chemin)) ;
 				}
 			
 			}
@@ -94,8 +95,6 @@ public class ServeurHTTP extends Server {
 		Date date = new Date() ;
 		String nom=requete.getNom() ;
 
-		System.out.println(requete);
-
 		if (requete.getType()>0){
 			String mimetype=requete.getMimetype() ;
 
@@ -115,9 +114,19 @@ public class ServeurHTTP extends Server {
 			else if (requete.getType()==5) {
 				try {
 					String[] commande = new String[1] ;
+					String paramFin ;
 					commande[0]=requete.getChemin() ;
-					// execute"$ cal 01 2018"
-					Process myp = Runtime.getRuntime().exec(commande[0]);
+					System.out.println(commande[0]);
+					if (requete.getParametre()!="") {
+						String[] param=requete.getParametre().split("&") ;
+						paramFin=" "+param[0].split("=")[1]+" "+param[1].split("=")[1] ;
+					}
+					else 
+						paramFin="" ;
+
+					Process myp = Runtime.getRuntime().exec(commande[0]+paramFin);
+					System.out.println(commande[0]+paramFin);
+
 					myp.waitFor(); 
 					// attention, cette attente peut bloquer si la commande externe rencontre un problème
 					String line = null;
@@ -147,7 +156,8 @@ public class ServeurHTTP extends Server {
 
 				writeline("<ul>") ;
 				for(File s:sousRep){
-					writeline("<li> <a href=\"http://localhost:1234"+ s.getPath()+"\">"+s.getName()+"</a> </li>");
+					writeline("<li> <a href=\"http://localhost:1234/."+ s.getPath()+"\">"+s.getName()+"</a> </li>");
+					System.out.println(s.getPath());
 				}
 				writeline("</ul>") ;	
 				writeline("</body>") ;
@@ -163,34 +173,43 @@ public class ServeurHTTP extends Server {
 				writeline("<html lang=\"fr_FR\">") ;
   				writeline("<head>") ;
     			writeline("<meta charset=\"utf-8\">") ;
-    			writeline("<meta http-equiv=\"refresh\" content=\"0; URL=http://localhost:1234"+reformChemin(requete.getChemin())+"/Index.html\">") ;
+    			writeline("<meta http-equiv=\"refresh\" content=\"0; URL=http://localhost:1234/"+reformChemin(requete.getChemin())+"/Index.html\">") ;
 				writeline("</head>") ;
 				writeline("</html>");
 			}
 		}
 			
-		else {
+		else if (requete.getType()==0) {
+			System.out.println("Ok type 0");
+
 			writeline("HTTP/1.0 404 Not Found") ;
 			writeline ("Content-type: text/html \n") ;
 
+			writeline("<!DOCTYPE html>");
+			writeline("<html lang=\"fr_FR\">") ;
+			writeline("<head>") ;
+			writeline("<meta charset=\"utf-8\">") ;
+			writeline("<meta http-equiv=\"refresh\" content=\"0; URL=http://localhost:1234/Erreur404/erreur404.html\">") ;
+			writeline("</head>") ;
+			writeline("</html>");
 
-			writeline("<!DOCTYPE html>") ;
+			/*writeline("<!DOCTYPE html>") ;
 			writeline("<html lang=\"fr_FR\">") ;
   			writeline("<head>") ;
     		writeline("<meta charset=\"utf-8\">") ;
    			writeline("<title>Erreur 404</title>") ;
-    		writeline("<link rel=\"stylesheet\" type=\"text/css\" href=\"/ServeurIAW-master V2/monsite/erreur404.css\">") ; 
+    		writeline("<link rel=\"stylesheet\" type=\"text/css\" href=\"Erreur404/erreur404.css\">") ; 
   			writeline("</head>") ;
 			writeline("<body>") ;
 			writeline("<h1>Erreur 404</h1>") ;
 			writeline("<div class=image>") ;
-			writeline("<img src=\"/ServeurIAW-master%20V2/monsite/Oups.png\" alt=\"image de Oups\">") ;
+			writeline("<img src=\"Erreur404/Oups.png\" alt=\"image de Oups\">") ;
 			writeline("</div>") ;
 			writeline("<div class=texte>") ;
 			writeline("<p> Le fichier demandé n'existe pas </p>") ; 
 			writeline("</div>") ;
 			writeline("</body>") ;
-			writeline("</html>") ;
+			writeline("</html>") ;*/
 		}
 
 
