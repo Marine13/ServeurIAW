@@ -51,7 +51,6 @@ public class ServeurHTTP extends Server {
 		String creply = null;
 		Requete res = new Requete ("") ;
 		creply = readline();
-		System.out.println(creply);
 		String[] listeMots=creply.split(" ") ;
 		String chemin = "" ;
 
@@ -95,13 +94,44 @@ public class ServeurHTTP extends Server {
 		Date date = new Date() ;
 		String nom=requete.getNom() ;
 
+		System.out.println(requete);
+
 		if (requete.getType()>0){
 			String mimetype=requete.getMimetype() ;
 
 			writeline("HTTP/1.0 200 OK") ;
-			writeline("Content-type :"+mimetype+"\n") ;
+			if (requete.getType()!=5) 
+			// Lorsque la requete demande l'execution d'un script shell (demande de type 5), le content-type y est déjà compris
+			// il ne faut donc pas le réécrire. 
+				writeline("Content-type :"+mimetype+"\n") ;
 
-			if (requete.getType()==2) {
+
+			// Type 1 lorsque URL est /date
+			if(requete.getType()==1){
+				writeline("Date courante : ") ;
+				writeline(dateFormat.format(date)+"\n") ;
+			}
+
+			else if (requete.getType()==5) {
+				try {
+					String[] commande = new String[1] ;
+					commande[0]=requete.getChemin() ;
+					// execute"$ cal 01 2018"
+					Process myp = Runtime.getRuntime().exec(commande[0]);
+					myp.waitFor(); 
+					// attention, cette attente peut bloquer si la commande externe rencontre un problème
+					String line = null;
+					BufferedReader in = new BufferedReader(new InputStreamReader(myp.getInputStream()));
+					while((line = in.readLine()) != null) {
+						writeline(line);
+					}
+				} 
+				catch(Exception e) {
+					writeline("error");
+				}
+			}
+
+			else if (requete.getType()==2){
 				writeline("<!doctype html>");
 				writeline("<html lang='fr'>") ;
 				writeline("<head>") ;
@@ -110,22 +140,18 @@ public class ServeurHTTP extends Server {
 				writeline("		<link rel='stylesheet' href='style.css'>") ;
 				writeline("</head>") ;
 				writeline("<body>") ;
-			}
-
-			if(requete.getType()==1){
-				writeline("Date courante : ") ;
-				writeline(dateFormat.format(date)+"\n") ;
-			}
-
-			else if (requete.getType()==2){
 				writeline("<h1> Le Répertoire "+String.valueOf(requete)+" contient : </h1>") ;
+
 				File repertoire = new File(requete.getChemin());
 				File[] sousRep = repertoire.listFiles();
+
 				writeline("<ul>") ;
 				for(File s:sousRep){
 					writeline("<li> <a href=\"http://localhost:1234"+ s.getPath()+"\">"+s.getName()+"</a> </li>");
 				}
-				writeline("</ul>") ;				
+				writeline("</ul>") ;	
+				writeline("</body>") ;
+				writeline("</html>") ; 			
 			}
 
 			else if (requete.getType()==3){
@@ -137,14 +163,9 @@ public class ServeurHTTP extends Server {
 				writeline("<html lang=\"fr_FR\">") ;
   				writeline("<head>") ;
     			writeline("<meta charset=\"utf-8\">") ;
-    			writeline("<meta http-equiv=\"refresh\" content=\"0; URL=http://localhost:1234"+requete.getChemin()+"/Index.html\">") ;
+    			writeline("<meta http-equiv=\"refresh\" content=\"0; URL=http://localhost:1234"+reformChemin(requete.getChemin())+"/Index.html\">") ;
 				writeline("</head>") ;
 				writeline("</html>");
-			}
-
-			if (requete.getType()==2){
-				writeline("</body>") ;
-				writeline("</html>") ; 
 			}
 		}
 			
@@ -152,18 +173,23 @@ public class ServeurHTTP extends Server {
 			writeline("HTTP/1.0 404 Not Found") ;
 			writeline ("Content-type: text/html \n") ;
 
-			
 
-			writeline("<!doctype html>");
-			writeline("<html lang='fr'>") ;
-			writeline("<head>") ;
-			writeline("		<meta charset=utf-8>") ;
-			writeline("		<title> Erreur 404 </title>") ;
-			writeline("		<link rel='stylesheet' href='style.css'>") ;
-			writeline("</head>") ;
+			writeline("<!DOCTYPE html>") ;
+			writeline("<html lang=\"fr_FR\">") ;
+  			writeline("<head>") ;
+    		writeline("<meta charset=\"utf-8\">") ;
+   			writeline("<title>Erreur 404</title>") ;
+    		writeline("<link rel=\"stylesheet\" type=\"text/css\" href=\"/ServeurIAW-master V2/monsite/erreur404.css\">") ; 
+  			writeline("</head>") ;
 			writeline("<body>") ;
-			writeline("		<p> Erreur 404 </p>") ;
-			writeline("</body>");
+			writeline("<h1>Erreur 404</h1>") ;
+			writeline("<div class=image>") ;
+			writeline("<img src=\"/ServeurIAW-master%20V2/monsite/Oups.png\" alt=\"image de Oups\">") ;
+			writeline("</div>") ;
+			writeline("<div class=texte>") ;
+			writeline("<p> Le fichier demandé n'existe pas </p>") ; 
+			writeline("</div>") ;
+			writeline("</body>") ;
 			writeline("</html>") ;
 		}
 
@@ -171,26 +197,35 @@ public class ServeurHTTP extends Server {
 	}
 
 	private void ecrireFichier(String chemin) throws IOException {
-		int br ;
-		byte[] b = new byte[1];
-		File f ;
-		f=new File(chemin) ;
-		FileInputStream fis ;
-		fis = new FileInputStream(f) ;
-		br=fis.read(b) ;
-		while (br>=0) {
-			write(b) ;
+		try {
+			int br ;
+			byte[] b = new byte[1];
+			File f ;
+			f=new File(chemin) ;
+			FileInputStream fis ;
+			fis = new FileInputStream(f) ;
 			br=fis.read(b) ;
+			while (br>=0) {
+				write(b) ;
+				br=fis.read(b) ;
+			}
+		}
+		catch (Exception e) {
+			return ;
 		}
 		
 	}
 
-	/*private static String reformChemin(String chemin) {
+	private static String reformChemin(String chemin) {
 		String[] partiesChemin = chemin.split(" ");
 		String res=partiesChemin[0] ;
 		for (int i=1 ; i<partiesChemin.length ; i++) {
 			res=res+"%20"+partiesChemin[i] ;
 		}
+		res=res.replaceAll("é","%C3%A9") ;
+		res=res.replaceAll("è", "%C3%A8") ;
+		res=res.replaceAll("ç", "%C3%A7") ;
 		return res ;
-	} */
+	}
+
 }

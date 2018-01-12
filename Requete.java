@@ -8,12 +8,26 @@ public class Requete {
 	private String nom ;
 
 	public Requete (String chemin){
-		this.chemin=chemin ;
+		chemin=chemin.replaceAll("%20", " ") ;
+		chemin=chemin.replaceAll("%C3%A9", "é") ;
+		chemin=chemin.replaceAll("%C3%A8", "è") ;
+		chemin=chemin.replaceAll("%C3%A7", "ç") ;
+		this.chemin="."+chemin ;
+
+		// Index type
+
 		if (chemin.equals("/date")) {
 			type=1 ;
 			mimetype="text/plain" ;
 			nom="Date courante" ;
 		}
+
+		/*else if (chemin.equals("/")) {
+			type=6 ;
+			mimetype="text/html" 
+			chemin="./" ;
+		}*/
+
 		else {
 			fichier=new File (chemin) ;
 			String[] nomCourant = chemin.split("/") ;
@@ -23,7 +37,7 @@ public class Requete {
 				if (fichier.isFile()) {
 					type=3 ;
 					try{
-						String[] extension = chemin.split(".") ;
+						String[] extension = chemin.split("\\.") ;
 						switch(extension[1]) {
 							case "jpg" : mimetype="image/jpg" ; break ;
 							case "png" : mimetype="image/png" ; break ;
@@ -32,6 +46,8 @@ public class Requete {
 							case "htm" : mimetype="text/html" ; break ;
 							case "css" : mimetype="text/css" ; break ;
 							case "pdf" : mimetype="application/pdf" ; break ;
+							case "sh" : mimetype="text/plain" ; 
+										type=5; break ;
 						}
 					}
 					catch(Exception e) {
@@ -55,6 +71,7 @@ public class Requete {
 			}
 			else 
 				type=0 ;
+				mimetype="text/html" ;
 		} 
 	}
 
