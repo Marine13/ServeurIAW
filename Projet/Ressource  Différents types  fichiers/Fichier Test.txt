@@ -1,0 +1,1 @@
+Fichier texte (extension txt) pour tester le mini-projet d'IAW sur les serveurs. 

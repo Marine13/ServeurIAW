@@ -1,0 +1,47 @@
+body {
+	background-image:url(fond-site.jpg);
+	background-repeat: no-repeat;
+	background-position: center center ;
+}
+
+h1{
+	font-size: 45px ;
+	background-color: #E1E2DF ;
+	border-bottom : solid #790018 3px;
+	color : #790018;
+	text-align: center ;
+	vertical-align: center ;
+	width : 120%;
+	margin-top: -150px;
+	margin-left: -170px ;
+	height: 70px ;
+	padding : 20px ; 
+	position: fixed;
+}
+
+ul{
+	margin-top : 150px ;
+}
+
+a{
+	color : #595D51;
+	text-decoration: none ;
+}
+
+a:hover{
+	color: black;
+	text-decoration: underline; 
+}
+
+a:visited{
+	color: #999D91;
+}
+
+li {
+	list-style: none ;
+	font-size: 30px ;
+}
+
+li:before{
+	content : "\A4\ ";
+}

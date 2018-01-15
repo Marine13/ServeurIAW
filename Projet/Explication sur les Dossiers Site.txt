@@ -1,0 +1,10 @@
+Le dossier "Mon Site Web" permet de tester la fonctionnalité demandé à la question 5 
+
+(question 5 : 
+
+Modifiez votre serveur de la manière suivante: 
+si c’est un dossier qui doit être listé, le dossier sera listé uniquement si aucun fichier index.html ou index.htm n’est présent  dans  ce  dossier.  Si  un  fichier  index.html  ou  index.htm  y  existe,  vous  devez charger la page index au lieu de lister le contenu du dossier.)
+
+
+Le dossier "Site Serveur" contient tous les fichiers HTML et CSS lié à la page d'index, de chiens et de chats.
+	
